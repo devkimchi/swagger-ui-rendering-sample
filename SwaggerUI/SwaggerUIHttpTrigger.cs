@@ -1,4 +1,5 @@
 using System;
+using System.Globalization;
 using System.IO;
 using System.Net;
 using System.Threading.Tasks;
@@ -29,7 +30,20 @@ namespace SwaggerUI
                 html = await reader.ReadToEndAsync().ConfigureAwait(false);
             }
 
-            var openapi = $"{req.Scheme}://{req.Host.Value.TrimEnd('/')}/{Environment.GetEnvironmentVariable("OpenApi__Document").TrimStart('/')}";
+            var openapi = default(string);
+            var openapiDocUri = Environment.GetEnvironmentVariable("OpenApi__Document");
+
+            // OpenAPI document comes from external source
+            if (openapiDocUri.StartsWith("http", ignoreCase: true, CultureInfo.InvariantCulture))
+            {
+                openapi = openapiDocUri;
+            }
+            // OpenAPI document hosted in the app
+            else
+            {
+                openapi = $"{req.Scheme}://{req.Host.Value.TrimEnd('/')}/{Environment.GetEnvironmentVariable("OpenApi__Document").TrimStart('/')}";
+            }
+
             html = html.Replace("[[OPENAPI_DOCUMENT_LOCATION]]", openapi);
 
             var result = new ContentResult()
