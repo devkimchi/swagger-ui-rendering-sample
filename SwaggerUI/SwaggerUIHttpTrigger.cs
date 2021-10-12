@@ -1,7 +1,6 @@
+using System;
 using System.IO;
-
 using System.Net;
-
 using System.Threading.Tasks;
 
 using Microsoft.AspNetCore.Http;
@@ -23,8 +22,6 @@ namespace SwaggerUI
 
             var filename = $"{context.FunctionAppDirectory.TrimEnd('/')}/index.html";
 
-            log.LogInformation(filename);
-
             var html = default(string);
             using (var stream = new FileStream(filename, FileMode.Open, FileAccess.Read))
             using (var reader = new StreamReader(stream))
@@ -32,7 +29,8 @@ namespace SwaggerUI
                 html = await reader.ReadToEndAsync().ConfigureAwait(false);
             }
 
-            log.LogInformation(html);
+            var openapi = Environment.GetEnvironmentVariable("OpenApi__Document");
+            html = html.Replace("[[OPENAPI_DOCUMENT_LOCATION]]", openapi);
 
             var result = new ContentResult()
             {
