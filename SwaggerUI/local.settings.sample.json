@@ -4,6 +4,6 @@
         "AzureWebJobsStorage": "UseDevelopmentStorage=true",
         "FUNCTIONS_WORKER_RUNTIME": "dotnet",
 
-        "OpenApi__Document": "https://petstore.swagger.io/v2/swagger.json"
+        "OpenApi__Document": "/api/swagger.json"
     }
 }

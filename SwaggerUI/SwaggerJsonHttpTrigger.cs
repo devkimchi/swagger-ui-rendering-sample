@@ -11,32 +11,29 @@ using Microsoft.Extensions.Logging;
 
 namespace SwaggerUI
 {
-    public static class SwaggerUIHttpTrigger
+    public static class SwaggerJsonHttpTrigger
     {
-        [FunctionName("SwaggerUIHttpTrigger")]
+        [FunctionName("SwaggerJsonHttpTrigger")]
         public static async Task<IActionResult> Run(
-            [HttpTrigger(AuthorizationLevel.Function, "get", Route = "swagger/ui")] HttpRequest req,
+            [HttpTrigger(AuthorizationLevel.Function, "get", Route = "swagger.json")] HttpRequest req,
             ILogger log, ExecutionContext context)
         {
             log.LogInformation("C# HTTP trigger function processed a request.");
 
-            var filename = $"{context.FunctionAppDirectory.TrimEnd('/')}/index.html";
+            var filename = $"{context.FunctionAppDirectory.TrimEnd('/')}/swagger.json";
 
-            var html = default(string);
+            var json = default(string);
             using (var stream = new FileStream(filename, FileMode.Open, FileAccess.Read))
             using (var reader = new StreamReader(stream))
             {
-                html = await reader.ReadToEndAsync().ConfigureAwait(false);
+                json = await reader.ReadToEndAsync().ConfigureAwait(false);
             }
-
-            var openapi = $"{req.Scheme}://{req.Host.Value.TrimEnd('/')}/{Environment.GetEnvironmentVariable("OpenApi__Document").TrimStart('/')}";
-            html = html.Replace("[[OPENAPI_DOCUMENT_LOCATION]]", openapi);
 
             var result = new ContentResult()
             {
                 StatusCode = (int) HttpStatusCode.OK,
-                Content = html,
-                ContentType = "text/html",
+                Content = json,
+                ContentType = "application/json",
             };
 
             return result;
